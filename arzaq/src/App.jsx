@@ -6,6 +6,8 @@ import { check_token } from './assets/script_files/helperFunc';
 import MessageBox from './assets/small_comps/MessageBox';
 import Head from "./Head"
 import Form from './Form';
+import Home from './Home';
+import Jops from './Jops';
 import Profile from './Profile';
 function App() {
   const [page,setPage]= useState('login')
@@ -18,9 +20,13 @@ function App() {
   const map_loggin=(dir)=>{
     switch(dir){
       case 'home':
-        return <Profile setPage={setPage}/>
-      default:
+        return <Home/>
+      case 'user':
+        return <Profile setPage={setPage} setNotification={setNotification} notification={notification}/>
+      case 'profile':
         return <Form type={page} setPage={setPage} setNotification={setNotification} notification={notification} loggedin={loggedin} setLogged={setLogged}/>
+      case 'jops':
+        return <Jops/>
     }
   }
   if(loggedin=='loading'){

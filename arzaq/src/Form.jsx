@@ -19,7 +19,7 @@ const Form = ({type,setPage,setLogged,notification,setNotification})=>{
     const Form_data=Map_forms(type)
     return(
         <>
-      <div className="form-card">
+      <div className="form-card" style={{marginTop:"3%"}}>
             <h1 className="form-header">{Form_data.header}</h1>
             <div className="row">
                 <div className="col">

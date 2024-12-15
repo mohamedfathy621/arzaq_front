@@ -1,4 +1,4 @@
-import { register,login,refresh_token,get_chart } from "./handle_requests";
+import { register,login,refresh_token,get_chart,edit } from "./handle_requests";
 import { login_form,register_form,profile_form } from "./Forms_classes";
 import { jwtDecode } from 'jwt-decode'
 import { send_order } from "./handle_requests";
@@ -19,6 +19,8 @@ function request_mapper(type,body){
             return register(body)
         case 'login':
             return login(body)
+        case 'profile':
+            return edit(body)
         case 'token':
             return refresh_token(body)
 
@@ -55,6 +57,9 @@ function check_out(state,setPage,setLoggedin){
             setPage('home')
             setLoggedin(true)
             break
+        case 'profile':
+            setPage('user')
+            break
     }
 }
 function validate_input(type,input){
@@ -62,8 +67,14 @@ function validate_input(type,input){
     switch(type.toLowerCase()){
         case 'username':
             return /^[A-Za-z][A-Za-z0-9]{4,}$/.test(input)
+        case 'firstname':
+            return /^[a-zA-Z\u0621-\u064A\s]{4,20}$/.test(input)
+        case 'lastname':
+            return /^[a-zA-Z\u0621-\u064A\s]{4,20}$/.test(input)
         case 'password':
             return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(input)
+        case 'phonenumber':
+            return /^(011|012|015)\d{8}$/.test(input)
         case 'email':
             return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(input)
         default:
@@ -80,6 +91,12 @@ function resolve_status(result,setNotification,notification,setValidations,formD
         localStorage.setItem('accessToken', result.data.access_token);
         localStorage.setItem('refreshToken', result.data.refresh_token);
         localStorage.setItem('username',formData.get('username'))
+        localStorage.setItem('profile',JSON.stringify(result.data.profile))
+        check_out(type,setPage,setLoggedin)
+        setNotification([result.data.message,(notification+1)%10])
+        setValidations([]);
+    }
+    else if(result.data.status==='edited'){
         localStorage.setItem('profile',JSON.stringify(result.data.profile))
         check_out(type,setPage,setLoggedin)
         setNotification([result.data.message,(notification+1)%10])

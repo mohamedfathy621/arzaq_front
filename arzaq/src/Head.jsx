@@ -4,7 +4,7 @@ import NavPanel from './assets/small_comps/NavPanel';
 import PropTypes from "prop-types";
 const Head = ({setPage,loggedin,setLogged,setNotification,count}) =>{
     return(
-        <div className="container Header-Container">
+        <div className="container Header-Container" style={{marginBottom:"0px"}}>
             <header className="d-flex flex-wrap py-1 border-bottom row" style={{paddingLeft:"3%",marginBottom:"0",paddingRight:"3%"}}>
                 <div className='row' style={{position:"relative",top:"14px"}}>
                     <div className='col' style={{display:"flex",height:"60%"}}>
