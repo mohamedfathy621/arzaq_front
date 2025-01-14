@@ -129,3 +129,9 @@ export function get_chart(Token){
         return error.response;
     });
 }
+
+export async function sendfile(formdata){
+
+    const response = await axios.post(`${base_url}upload`,formdata)
+    return response
+}

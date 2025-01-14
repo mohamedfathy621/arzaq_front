@@ -92,6 +92,7 @@ function resolve_status(result,setNotification,notification,setValidations,formD
         localStorage.setItem('refreshToken', result.data.refresh_token);
         localStorage.setItem('username',formData.get('username'))
         localStorage.setItem('profile',JSON.stringify(result.data.profile))
+        localStorage.setItem('profile_pic',(result.data.profile.profile_image_url))
         check_out(type,setPage,setLoggedin)
         setNotification([result.data.message,(notification+1)%10])
         setValidations([]);
@@ -154,6 +155,7 @@ export function log_out(setNotification,setLogged,setPage,count){
         localStorage.removeItem("refreshToken")
         localStorage.removeItem('username')
         localStorage.removeItem('profile')
+        localStorage.removeItem('profile_pic')
         sessionStorage.removeItem('refills')
         sessionStorage.removeItem('total')
         setNotification(['logged out',count+1])
