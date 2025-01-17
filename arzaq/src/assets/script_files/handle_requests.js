@@ -13,14 +13,68 @@ export function register(body){
 export function login(body){
     const request_url=`${base_url}login`
     return axios.post(request_url,body).then((result)=>{
-        console.log(result)
+       
         return result;
     }).catch((error)=>{
-        console.log(error.response)
+        
         return error.response;
     });
 }
-export async function test (test_url){
+export function post_job(body){
+    const request_url=`${base_url}jop`
+    body['poster']=localStorage.getItem('username')
+    console.log(body)
+    return axios.post(request_url,body,{
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Attach token to Authorization header
+        }}).then((result)=>{
+        
+        return result;
+    }).catch((error)=>{
+        
+        return error.response;
+    });
+}
+export function send_app(body){
+    const request_url=`${base_url}apply`
+    return axios.post(request_url,body,{
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Attach token to Authorization header
+        }}).then((result)=>{
+       
+        return result;
+    }).catch((error)=>{
+        
+        return error.response;
+    });
+}
+export function get_app(body){
+    const request_url=`${base_url}getapply`
+    return axios.post(request_url,body,{
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Attach token to Authorization header
+        }}).then((result)=>{
+        
+        return result;
+    }).catch((error)=>{
+        
+        return error.response;
+    });
+}
+export function get_jops(){
+    const request_url=`${base_url}getjop`
+    return axios.get(request_url,{
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Attach token to Authorization header
+        }}).then((result)=>{
+       
+        return result;
+    }).catch((error)=>{
+       
+        return error.response;
+    });
+}
+export async function test (test_url,notification,setNotification){
     try {
         console.log("here am i "+test_url)
         const response = await fetch(`${base_url}check-url`, {
@@ -33,6 +87,7 @@ export async function test (test_url){
     
         const data = await response.json();
         if (data.error) {
+         setNotification(['no data about links in this file',(notification+1)%10])
          return {'veridct': 'no data about this link'};
         } else {
             const stats = data.data.attributes.last_analysis_stats;
@@ -40,13 +95,13 @@ export async function test (test_url){
             const suspiciousCount = stats.suspicious || 0;
             const harmlessCount = stats.harmless || 0;
             if (maliciousCount > 0) {
-                console.log('Malicious');
+                setNotification(['this file contains maliouces links',(notification+1)%10])
                 return {'veridct': 'Malicious'};
               } else if (suspiciousCount > 0) {
-                console.log('Suspicious');
+                setNotification(['this file contains Suspicious links',(notification+1)%10])
                 return {'veridct': 'Suspicious'};
               } else if (harmlessCount > 0) {
-                console.log('Clean');
+                setNotification(['this file is clean from malware',(notification+1)%10])
                 return {'veridct': 'Clean'};
               } 
         }
@@ -63,10 +118,10 @@ export function edit(body){
             Authorization: `Bearer ${token}`, // Attach token to Authorization header
         },
     }).then((result)=>{
-        console.log(result)
+        
         return result;
     }).catch((error)=>{
-        console.log(error.response)
+       
         return error.response;
     });
 }
@@ -99,7 +154,7 @@ export function get_medications(Token){
 export function send_order(Token,body){
     const request_url=`${base_url}medications/order`
     const token = Token // Get the token
-    console.log(token)
+    
     return axios.post(request_url,body,{
         headers: {
             Authorization: `Bearer ${token}`, // Attach token to Authorization header
@@ -132,6 +187,9 @@ export function get_chart(Token){
 
 export async function sendfile(formdata){
 
-    const response = await axios.post(`${base_url}upload`,formdata)
+    const response = await axios.post(`${base_url}upload`,formdata,{
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Attach token to Authorization header
+        }})
     return response
 }

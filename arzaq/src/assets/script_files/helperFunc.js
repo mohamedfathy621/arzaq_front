@@ -1,5 +1,5 @@
-import { register,login,refresh_token,get_chart,edit } from "./handle_requests";
-import { login_form,register_form,profile_form } from "./Forms_classes";
+import { register,login,refresh_token,get_chart,edit,post_job } from "./handle_requests";
+import { login_form,register_form,profile_form,job_form } from "./Forms_classes";
 import { jwtDecode } from 'jwt-decode'
 import { send_order } from "./handle_requests";
 export function Map_forms(type){
@@ -10,6 +10,8 @@ export function Map_forms(type){
             return login_form
         case 'profile':
             return profile_form
+        case 'job_form':
+            return job_form
     }
 }
 
@@ -23,7 +25,8 @@ function request_mapper(type,body){
             return edit(body)
         case 'token':
             return refresh_token(body)
-
+        case 'job_form':
+            return post_job(body)
     }
 }
 
@@ -49,6 +52,7 @@ function help_submit(formData){
     return toggle?{data:formObject,valid:true}:{error:validation_errors,valid:false}
 }
 function check_out(state,setPage,setLoggedin){
+    console.log(state)
     switch(state){
         case 'register':
             setPage('login')
@@ -59,6 +63,10 @@ function check_out(state,setPage,setLoggedin){
             break
         case 'profile':
             setPage('user')
+            break
+        case 'job_form':
+            console.log('lool')
+            setPage('jops')
             break
     }
 }
@@ -77,6 +85,12 @@ function validate_input(type,input){
             return /^(011|012|015)\d{8}$/.test(input)
         case 'email':
             return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(input)
+        case 'Jop title':
+            return /^[a-zA-Z\u0621-\u064A\s]{3,100}$/.test(input)
+        case 'experince':
+                return /^[a-zA-Z\u0621-\u064A\s]{3,100}$/.test(input)
+        case 'job type':
+                return /^[a-zA-Z\u0621-\u064A\s]{3,100}$/.test(input)
         default:
             return true
     }
@@ -88,11 +102,14 @@ function resolve_status(result,setNotification,notification,setValidations,formD
     //the user state changes to logged in 
     //on faluire the user is notified about the faliure and the cause of the faliure
     if(result.data.status==='success'){
-        localStorage.setItem('accessToken', result.data.access_token);
-        localStorage.setItem('refreshToken', result.data.refresh_token);
-        localStorage.setItem('username',formData.get('username'))
-        localStorage.setItem('profile',JSON.stringify(result.data.profile))
-        localStorage.setItem('profile_pic',(result.data.profile.profile_image_url))
+        if(type=='login'){
+            localStorage.setItem('accessToken', result.data.access_token);
+            localStorage.setItem('refreshToken', result.data.refresh_token);
+            localStorage.setItem('username',formData.get('username'))
+            localStorage.setItem('profile',JSON.stringify(result.data.profile))
+            localStorage.setItem('profile_pic',(result.data.profile.profile_image_url))
+            localStorage.setItem('profile_cv',(result.data.profile.profile_cv_url))
+        }
         check_out(type,setPage,setLoggedin)
         setNotification([result.data.message,(notification+1)%10])
         setValidations([]);
@@ -156,6 +173,7 @@ export function log_out(setNotification,setLogged,setPage,count){
         localStorage.removeItem('username')
         localStorage.removeItem('profile')
         localStorage.removeItem('profile_pic')
+        localStorage.removeItem('profile_cv')
         sessionStorage.removeItem('refills')
         sessionStorage.removeItem('total')
         setNotification(['logged out',count+1])
@@ -203,6 +221,8 @@ export function check_token(isMounted,setPage,setLogged,setNotification,notifica
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("profile");
+        localStorage.removeItem('profile_pic')
+        localStorage.removeItem('profile_cv')
       }
 }
 

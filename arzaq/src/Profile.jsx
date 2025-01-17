@@ -1,55 +1,79 @@
 import PropTypes from "prop-types";
 import { useState,useEffect } from "react";
 import pdfToText from 'react-pdftotext'
-import logo from './assets/images/logo3.png'
 import { test,sendfile } from "./assets/script_files/handle_requests";
-const Profile= ({setPage})=>{
+const Profile= ({setPage,notification,setNotification})=>{
     const profile= JSON.parse(localStorage.getItem('profile'))
     const [urls, setUrls] = useState([]);
     const [pic,setPic] = useState();
     const [picsrc,setPicsrc] = useState(localStorage.getItem("profile_pic")?localStorage.getItem("profile_pic"):null)
-    console.log(profile)
+    const [mal,setmal] = useState(false)
+    const [cv,setFIle] = useState()
+    
     const extractUrls = (text) => {
-        const urlRegex = /\b(?:http(?:s)?:\/\/|www\.)[^\s]+/g;
-        console.log(text)
+        const urlRegex = /\b(?:https?:\/\/|www\.)[^\s]+/g;
+        
         let array= text.filter(word => urlRegex.test(word));
-        console.log(array)
+        
         return array;
       };
-    urls.forEach(url => {
-             let verdict = ''
-             //test(url).then(result=>verdict=result['veridct'])
-             //if(verdict=='Suspicious'||verdict=='Malicious'){
-                //console.log(verdict)
-             //}
-             console.log(url)
-    })
+    const try_to_test = () =>{
+        urls.forEach(url => {
+            let verdict = ''
+            test(url.split('//')[1],notification,setNotification).then(result=>verdict=result['veridct'])
+            if(verdict!='Clean'){
+                setmal(true)
+            }
+        })
+    }
     const handleFileChange = async (event) => {
         const file = event.target.files[0];
         if (file && file.type === 'application/pdf') {
+            setFIle(file)
             const reader = new FileReader();
             reader.onload = async () => {
                 pdfToText(file)
                 .then(text => {
-                    console.log(text)
+                   
                     setUrls(extractUrls(text.split(/\s+/)))})
+                   
                  .catch(error => console.error("Failed to extract text from pdf"+error))
             };
             reader.readAsArrayBuffer(file);
         } else {
+            setUrls([])
+            setFIle()
             alert('Please upload a valid PDF file.');
         }
     };
+    const handlePicChange = (event) =>{
+        const file = event.target.files[0]
+        if (file && file.type.startsWith('image/')) {
+            setPic(event.target.files[0])
+        }
+        else{
+            alert('Please upload a valid image file.');
+        }
+    }
     const try_to_hit = () => {
         const button = document.getElementById('input');
         button.click();
     }
-    const try_to_send = () =>{
+    const try_to_send = (file,name) =>{
         const formdata = new FormData();
-        formdata.append("file", pic);
+        formdata.append("file", file);
         formdata.append('username',localStorage.getItem('username'))
+        formdata.append('filename',name)
         sendfile(formdata).then((ans)=>{
-            localStorage.setItem("profile_pic",ans.data.file_url)
+            if(name=='profile_pic'){
+                localStorage.setItem("profile_pic",ans.data.file_url)
+                setPicsrc(ans.data.file_url)
+                setPic()
+            }
+            else{
+                localStorage.setItem("profile_cv",ans.data.file_url)
+                setFIle()
+            }
         })
     }
     useEffect(()=>{
@@ -62,14 +86,14 @@ const Profile= ({setPage})=>{
         }
     },[pic])
 return(
-    <div className="form-card" style={{minHeight:"30rem",width:"60%",marginTop:"5%"}}>
+    <div className="form-card" style={{minHeight:"30rem",width:"60%",marginTop:"2%"}}>
         <div className="row" style={{marginBottom:"30px"}}>
             <div className="col">
             <div className="card card-img-top card_image" style={{width:"200px",height:"200px",marginRight:"0px",cursor:"pointer",marginLeft:'0px',marginBottom:"10px"}} onClick={try_to_hit}>   
             <img  src={picsrc} style={{maxWidth:'100%',height:"100%"}}></img>   
-            <input type="file"  onChange={(event) => setPic(event.target.files[0])} style={{visibility:"hidden"}} id="input"/>
+            <input type="file"  onChange={(event) => handlePicChange(event)} style={{visibility:"hidden"}} id="input"/>
             </div>
-            <button className="btn btn-success" onClick={try_to_send}> submit</button>
+            <button className="btn btn-success" onClick={()=>try_to_send(pic,'profile_pic')} style={{display:pic?'block':'none'}}> submit</button>
             </div>
             <div className="col">
                 <h1 style={{marginBottom:'20px'}}>{profile.profile_name}</h1>
@@ -89,12 +113,15 @@ return(
             <div>
             <h2 style={{marginBottom:'20px'}}>{profile.profile_name+" is "+profile.profile_type}</h2>
             </div>
+            <div>
+            <h5 style={{marginBottom:'20px',width:"70%"}}>cv : <a href={localStorage.getItem('profile_cv')} style={{color:"blue",textDecoration:"underline"}}>cloud link</a></h5>
+            </div>
             <div className="row" >
             < button  className="btn btn-primary" onClick={()=>setPage('profile')} style={{width:"10%", margin:"auto",marginBottom:"30px"}}>EDIT</button>
             <div>
             <h5 style={{marginBottom:'20px',width:"70%"}}>upload a cv </h5>
             <input type="file" accept="application/pdf" onChange={handleFileChange}/>
-            <button className="btn btn-success" onClick={()=>console.log(urls)}> submit</button>
+            <button className="btn btn-success" onClick={()=>try_to_send(cv,'profile_cv')} style={{display:cv && !mal?'inline':'none'}}> submit</button>
             </div>
             </div>
           

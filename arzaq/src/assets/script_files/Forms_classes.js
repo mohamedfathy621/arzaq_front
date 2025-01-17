@@ -32,4 +32,10 @@ const titles=new Input_Feilds('titles','text','engineer/ceo','titles',{color:'re
 const description=new Input_Feilds('description','text','tell something about yourself','description',{color:'red',display:'block',content:''})
 const profile_fields=[first_name,last_name,titles,description,phone_number,email_inpput]
 const profile_form=new Input_Forms('save data',profile_fields,'edit your data')
-export {register_form,login_form,profile_form}
+const job_title=new Input_Feilds('Jop title','text','','jop_title',{color:'red',display:'none',content:'invalid job_title'})
+const experince=new Input_Feilds('experince','text','fresh/junior/senior','experince',{color:'red',display:'none',content:'invalid experince'})
+const salary=new Input_Feilds('salary','number','','salary',{color:'red',display:'none',content:'invalid salary'})
+const jobtype=new Input_Feilds('job type','text','full time/part time/contract','jobtype',{color:'red',display:'none',content:'invalid job type'})
+const company=new Input_Feilds('company name','text','','company',{color:'red',display:'none',content:'invalid company type'})
+const job_form=new Input_Forms('POST JOB',[job_title,experince,salary,jobtype,company],'reach new employees')
+export {register_form,login_form,profile_form,job_form}

@@ -16,7 +16,9 @@ const Form = ({type,setPage,setLogged,notification,setNotification})=>{
     const send_submit = (event) =>{
         handle_submit(event,type,setNotification,notification,setValidations,setPage,setLogged)
     } 
+    
     const Form_data=Map_forms(type)
+    console.log(type)
     return(
         <>
       <div className="form-card" style={{marginTop:"3%"}}>

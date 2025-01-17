@@ -8,12 +8,14 @@ import Head from "./Head"
 import Form from './Form';
 import Home from './Home';
 import Jops from './Jops';
+import Jop_detail from './Jop_detail';
 import Profile from './Profile';
 function App() {
   const [page,setPage]= useState('login')
   const [notification,setNotification]= useState(['',0])
   const [loggedin,setLogged]=useState('loading')
   const isMounted = useRef(false)
+ 
   useEffect(()=>{
     check_token(isMounted,setPage,setLogged,setNotification,notification)
   },[loggedin])
@@ -26,7 +28,9 @@ function App() {
       case 'profile':
         return <Form type={page} setPage={setPage} setNotification={setNotification} notification={notification} loggedin={loggedin} setLogged={setLogged}/>
       case 'jops':
-        return <Jops/>
+        return <Jops setPage={setPage} setNotification={setNotification} notification={notification}/>
+      case 'job_form':
+        return <Form type={page} setPage={setPage} setNotification={setNotification} notification={notification} loggedin={loggedin} setLogged={setLogged}/>
     }
   }
   if(loggedin=='loading'){
